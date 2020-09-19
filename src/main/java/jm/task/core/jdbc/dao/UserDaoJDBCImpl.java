@@ -49,11 +49,13 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             Util util = new Util();
             String saveUserQuery = ("INSERT INTO `user`.`users` (name, lastName, age) " +
-                    "VALUES ('" + name + "', '" + lastName + "', '" + age + "')");
-            Statement statement = util.getConnection().createStatement();
-            statement.execute(saveUserQuery);
+                    "VALUES ( ?, ?, ? )");
+            PreparedStatement preparedStatement = util.getConnection().prepareStatement(saveUserQuery);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setByte(3, age);
+            preparedStatement.executeUpdate();
             System.out.println("User with name - " + name + " added to database");
-
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
         }
@@ -64,10 +66,10 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             Util util = new Util();
             String removeUserByIdQuery = "DELETE FROM `user`.`users` WHERE id= ?";
-            PreparedStatement statement = util.getConnection().prepareStatement(removeUserByIdQuery);
-            statement.setLong(1, id);
-            statement.executeUpdate();
-            statement.close();
+            PreparedStatement preparedStatement = util.getConnection().prepareStatement(removeUserByIdQuery);
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException sqlException) {
             System.out.println("User with id = " + id +  " not exists in database");
         }
